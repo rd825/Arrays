@@ -31,6 +31,8 @@ Array *create_array(int capacity)
   // Allocate memory for elements
   // we need to malloc times the size of the thing we're pointing to (bc elements is being declared via double pointer).
   arr->elements = malloc(sizeof(char *) * capacity);
+
+  return arr;
 }
 
 /*****
@@ -110,14 +112,28 @@ void arr_insert(Array *arr, char *element, int index)
 {
 
   // Throw an error if the index is greater than the current count
+  if (index > arr->count)
+  {
+    printf("Index is greater than current count: %i\n", arr->count);
+    exit(1);
+  }
 
   // Resize the array if the number of elements is over capacity
+  if (arr->count + 1 > arr->capacity)
+  {
+    resize_array(arr);
+  }
 
   // Move every element after the insert index to the right one position
-
+  for (int i = index; i < arr->count; i++)
+  {
+    arr->elements[i + 1] = arr->elements[i];
+  }
   // Copy the element and add it to the array
+  arr->elements[index] = element;
 
   // Increment count by 1
+  arr->count++;
 }
 
 /*****
@@ -151,11 +167,27 @@ void arr_remove(Array *arr, char *element)
 {
 
   // Search for the first occurence of the element and remove it.
-  // Don't forget to free its memory!
+  int position = 0;
+  for (int i = 0; i < arr->count; i++)
+  {
+    if (arr->elements[i] == element)
+    {
+      position = i;
+      arr->elements[i] = NULL;
+      // Don't forget to free its memory!
+      free(arr->elements[i]);
+    }
+  }
+
+  for (int i = position; i < arr->count; i++)
+  {
+    arr->elements[i] = arr->elements[i + 1];
+  }
 
   // Shift over every element after the removed element to the left one position
 
   // Decrement count by 1
+  arr->count--;
 }
 
 /*****
